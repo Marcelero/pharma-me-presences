@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Présences Pharmacie de la Mé</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--primary:#4550E5;--primary2:#5B67F0;--accent:#4ECDC4;--accent2:#3BBDB5;--sky:#eef2ff;--green:#059669;--red:#dc2626;--grey:#64748b;--border:#e2e8f0;--bg:#f4f6fb;--card:#fff;--text:#0f172a}
+    body.dark{--primary:#5B67F0;--primary2:#7C88F5;--accent:#4ECDC4;--sky:#1e2a4a;--green:#10b981;--red:#f87171;--grey:#94a3b8;--border:#334155;--bg:#0f172a;--card:#1e293b;--text:#e2e8f0}
+    body.dark .top-bar{background:#0f172a}
+    body.dark .tabs{background:#1e293b;border-color:#334155}
+    body.dark .field input,.body.dark .f-group input,.body.dark .f-group select,.body.dark .search-input{background:#0f172a;color:#e2e8f0;border-color:#334155}
+    body.dark .card{background:#1e293b}
+    body.dark .r-item{border-color:#334155;background:#1e293b}
+    body.dark .r-item:hover{background:#263548}
+    body.dark .r-item.sel{background:#1e3a7a;border-color:var(--primary)}
+    body.dark thead{background:#0f172a}
+    body.dark tbody tr:hover{background:#263548}
+    body.dark .modal{background:#1e293b}
+    body.dark .count-pill{background:#334155;color:#94a3b8}
+    body.dark .histo-head{background:#0f172a}
+    body.dark .histo-head:hover{background:#1e3a7a}
+    body.dark .histo-body{background:#1e293b;border-color:#334155}
+    body.dark .histo-item{border-color:#334155}
+    body.dark .card-title{color:#93c5fd}
+    body.dark tbody td{color:#cbd5e1}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:#0f172a;min-height:100vh}
+
+    /* LOGIN */
+    #loginScreen{position:fixed;inset:0;background:linear-gradient(160deg,#3340CC,#4550E5 55%,#5B67F0);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
+    .login-box{background:#fff;border-radius:28px;padding:44px 36px;width:100%;max-width:380px;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.4)}
+    .login-logo{width:72px;height:72px;margin:0 auto 20px;background:#4550E5;border-radius:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(69,80,229,.35)}
+    .login-logo svg{width:56px;height:56px}
+    .login-title{font-size:22px;font-weight:800;color:#3340CC}
+    .login-sub{font-size:13px;color:var(--grey);margin:6px 0 30px}
+    .login-box input[type=password]{width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:14px;font-family:inherit;font-size:20px;text-align:center;letter-spacing:10px;outline:none;background:#fafbff;transition:border-color .2s,box-shadow .2s}
+    .login-box input[type=password]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(78,205,196,.2)}
+    .login-box input.shake{animation:shake .35s;border-color:var(--red)}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}60%{transform:translateX(10px)}}
+    .login-btn{width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,#4550E5,#5B67F0);color:#fff;border:none;border-radius:14px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .15s}
+    .login-btn:hover{opacity:.92;transform:translateY(-1px)}
+    .login-err{color:var(--red);font-size:13px;margin-top:10px;min-height:20px;font-weight:500}
+
+    /* FIREBASE SETUP BANNER */
+    #setupBanner{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#3340CC,#4550E5);z-index:8000;overflow-y:auto;padding:30px 20px}
+    .setup-card{background:#fff;border-radius:24px;padding:36px;max-width:640px;margin:0 auto;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+    .setup-card h2{font-size:20px;font-weight:800;color:#3340CC;margin-bottom:6px}
+    .setup-card p{font-size:13px;color:var(--grey);line-height:1.6;margin-bottom:20px}
+    .step{background:#f8fafc;border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:14px 18px;margin-bottom:12px}
+    .step strong{display:block;font-size:13px;font-weight:700;color:#3340CC;margin-bottom:4px}
+    .step span{font-size:12px;color:var(--grey);line-height:1.6}
+    .code{background:#1e293b;color:#7dd3fc;font-family:monospace;font-size:11px;border-radius:10px;padding:14px 16px;margin:12px 0;white-space:pre;overflow-x:auto;line-height:1.7}
+    .setup-ok-btn{width:100%;padding:14px;background:linear-gradient(135deg,#4550E5,#5B67F0);color:#fff;border:none;border-radius:14px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;margin-top:10px}
+
+    /* APP */
+    #appScreen{display:none;min-height:100vh}
+    .top-bar{background:#3340CC;height:58px;padding:0 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+    .tb-logo-wrap{display:flex;align-items:center;gap:10px}
+    .tb-logo-svg{width:32px;height:32px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:3px;flex-shrink:0}
+    .tb-logo-svg svg{width:26px;height:26px}
+    .tb-name{font-size:15px;font-weight:800;color:#fff;letter-spacing:.3px}
+    .tb-badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+    .tb-spacer{flex:1}
+    .tb-logout{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);padding:6px 14px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
+    .tabs{background:#fff;border-bottom:2px solid var(--border);display:flex;padding:0 24px;position:sticky;top:58px;z-index:99;overflow-x:auto}
+    .tab{padding:14px 18px;font-size:13px;font-weight:700;color:var(--grey);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;margin-bottom:-2px;font-family:inherit;white-space:nowrap}
+    .tab.active{color:var(--primary);border-bottom-color:var(--accent)}
+    .content{padding:28px 24px;max-width:1080px;margin:0 auto}
+    .panel{display:none}.panel.active{display:block}
+
+    .card{background:var(--card);border-radius:18px;padding:24px;box-shadow:0 1px 6px rgba(69,80,229,.07),0 4px 16px rgba(69,80,229,.04);margin-bottom:20px}
+    .card-title{font-size:15px;font-weight:700;color:#3340CC;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+
+    .f-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:640px){.f-grid{grid-template-columns:1fr}}
+    .f-group label{display:block;font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+    .f-group input,.f-group select{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:11px;font-family:inherit;font-size:14px;color:#111;background:#fafbff;outline:none;transition:border-color .2s,box-shadow .2s}
+    .f-group input:focus,.f-group select:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(78,205,196,.12)}
+
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border:none;border-radius:10px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+    .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:#3340CC;transform:translateY(-1px)}
+    .btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#047857}
+    .btn-outline{background:#fff;color:var(--primary);border:2px solid var(--primary)}.btn-outline:hover{background:var(--sky)}
+    .btn-red{background:var(--red);color:#fff}.btn-red:hover{background:#b91c1c}
+    .btn-teal{background:var(--accent);color:#fff}.btn-teal:hover{background:var(--accent2)}
+    .btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
+    .btn-xs{padding:4px 10px;font-size:11px;border-radius:7px;border:1.5px solid currentColor}
+
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    @media(max-width:768px){.two-col{grid-template-columns:1fr}}
+
+    .r-list{display:flex;flex-direction:column;gap:10px}
+    .r-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid var(--border);border-radius:13px;cursor:pointer;transition:all .2s}
+    .r-item:hover{border-color:#a5b4fc;background:#eef2ff}.r-item.sel{border-color:var(--accent);background:#f0fdfb}
+    .r-dot{width:10px;height:10px;border-radius:50%;background:var(--border);flex-shrink:0}.r-item.sel .r-dot{background:var(--accent)}
+    .r-info{flex:1;min-width:0}
+    .r-label{font-size:14px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .r-date{font-size:12px;color:var(--grey);margin-top:2px}
+    .r-count{background:#d1faf8;color:#0f5e5a;border-radius:20px;padding:3px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+    .r-del{color:#cbd5e1;cursor:pointer;font-size:16px;padding:4px;flex-shrink:0}.r-del:hover{color:var(--red)}
+
+    .qr-area{display:flex;flex-direction:column;align-items:center;gap:16px}
+    .qr-area img{border:8px solid #fff;box-shadow:0 0 0 1px var(--border);border-radius:8px}
+    .qr-meta{text-align:center}
+    .qr-reunion-name{font-size:15px;font-weight:700;color:#3340CC}
+    .qr-reunion-date{font-size:12px;color:var(--grey);margin-top:3px;text-transform:capitalize}
+    .qr-empty{text-align:center;padding:40px 20px;color:#94a3b8}
+    .qr-empty .icon{font-size:44px;margin-bottom:10px}.qr-empty .msg{font-size:13px}
+
+    .tbl-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+    .search-input{flex:1;min-width:180px;padding:9px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:13px;outline:none;transition:border-color .2s}
+    .search-input:focus{border-color:var(--accent)}
+    .count-pill{background:#f1f5f9;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;color:var(--grey);white-space:nowrap}
+    .table-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--border)}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    thead{background:#f8fafc}
+    thead th{padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap}
+    tbody tr{border-bottom:1px solid #f1f5f9;transition:background .1s}
+    tbody tr:hover{background:#fafbff}
+    tbody tr:last-child{border-bottom:none}
+    tbody td{padding:11px 14px;color:#334155}
+    .td-actions{display:flex;gap:6px}
+    .empty-tbl{text-align:center;padding:60px 20px;color:#94a3b8}
+    .empty-tbl .e-icon{font-size:44px;margin-bottom:12px}
+    .empty-tbl .e-title{font-size:15px;font-weight:600}
+    .empty-tbl .e-sub{font-size:13px;margin-top:4px}
+
+    .reunion-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 22px}
+    .reunion-bar label{font-size:13px;font-weight:700;color:var(--grey);white-space:nowrap}
+    .reunion-bar select{flex:1;min-width:220px;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:13px;outline:none}
+
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:500;padding:20px;backdrop-filter:blur(2px)}
+    .modal-bg.show{display:flex}
+    .modal{background:#fff;border-radius:22px;padding:30px;width:100%;max-width:480px;box-shadow:0 24px 60px rgba(0,0,0,.3);animation:slideUp .25s ease}
+    @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .modal-title{font-size:18px;font-weight:800;color:#3340CC;margin-bottom:22px}
+    .modal-foot{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+
+    .toast{position:fixed;bottom:24px;right:24px;background:#0f172a;color:#fff;padding:13px 20px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 8px 20px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;transform:translateY(8px);z-index:9999}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .toast.ok{background:var(--green)}.toast.err{background:var(--red)}
+    .divider{height:1px;background:var(--border);margin:16px 0}
+    .histo-item{border:1.5px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;transition:border-color .2s}
+    .histo-item:hover{border-color:#a5b4fc}
+    .histo-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;background:#fafbff;transition:background .15s}
+    .histo-head:hover{background:#eef2ff}
+    .histo-body{padding:16px;border-top:1px solid var(--border);background:#fff}
+
+    .erocime-footer{text-align:center;padding:20px;font-size:11px;color:#94a3b8;border-top:1px solid var(--border);margin-top:10px}
+    @media print{.no-print{display:none!important}}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="18" r="16" fill="#4ECDC4"/>
+        <circle cx="18" cy="50" r="16" fill="#4ECDC4"/>
+        <circle cx="50" cy="50" r="16" fill="#4ECDC4"/>
+        <circle cx="82" cy="50" r="16" fill="#4ECDC4"/>
+        <circle cx="50" cy="82" r="16" fill="#4ECDC4"/>
+      </svg>
+    </div>
+    <div class="login-title">Pharmacie de la Mé</div>
+    <div class="login-sub">Administration – Gestion des présences</div>
+    <input type="password" id="pwdInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">🔐 Connexion sécurisée</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- FIREBASE SETUP GUIDE -->
+<div id="setupBanner">
+  <div class="setup-card">
+    <h2>⚙️ Configuration Firebase requise</h2>
+    <p>Firebase n'est pas encore configuré. Suivez ces étapes pour activer la base de données cloud dédiée à la Pharmacie de la Mé.</p>
+
+    <div class="step">
+      <strong>Étape 1 – Créer le projet Firebase</strong>
+      <span>Allez sur <b>console.firebase.google.com</b> → "Ajouter un projet" → Nommez-le <b>pharma-me-presences</b></span>
+    </div>
+
+    <div class="step">
+      <strong>Étape 2 – Activer Firestore</strong>
+      <span>"Firestore Database" → "Créer une base de données" → Mode Production → Choisir une région (eur3 ou nam5)</span>
+    </div>
+
+    <div class="step">
+      <strong>Étape 3 – Configurer les règles Firestore</strong>
+      <span>Onglet "Règles" → Remplacez par :</span>
+      <div class="code">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /pharma_reunions/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /pharma_presences/{id} {
+      allow read, write: if true;
+    }
+    match /pharma_membres/{id} {
+      allow read, write: if true;
+    }
+  }
+}</div>
+    </div>
+
+    <div class="step">
+      <strong>Étape 4 – Coller la configuration</strong>
+      <span>Paramètres du projet → "Vos applications" → Ajouter une app Web → Copier les valeurs dans le bloc <b>firebaseConfig</b> de <b>admin-pharma.html</b> et <b>scan-pharma.html</b></span>
+    </div>
+
+    <div class="step">
+      <strong>Étape 5 – Définir l'URL GitHub Pages</strong>
+      <span>Dans le bloc CONFIG, remplacez <b>baseUrl</b> par l'URL de votre dépôt GitHub Pages dédié</span>
+    </div>
+
+    <button class="setup-ok-btn" onclick="document.getElementById('setupBanner').style.display='none'">
+      ✅ Configuration faite – Retour à l'application
+    </button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appScreen">
+  <header class="top-bar no-print">
+    <div class="tb-logo-wrap">
+      <div class="tb-logo-svg">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="100" fill="#4550E5" rx="10"/>
+          <circle cx="50" cy="18" r="14" fill="#4ECDC4"/>
+          <circle cx="18" cy="50" r="14" fill="#4ECDC4"/>
+          <circle cx="50" cy="50" r="14" fill="#4ECDC4"/>
+          <circle cx="82" cy="50" r="14" fill="#4ECDC4"/>
+          <circle cx="50" cy="82" r="14" fill="#4ECDC4"/>
+        </svg>
+      </div>
+      <span class="tb-name">Pharmacie de la Mé</span>
+    </div>
+    <span class="tb-badge">Administration</span>
+    <span class="tb-spacer"></span>
+    <button class="tb-logout" id="darkBtn" onclick="toggleDark()" style="margin-right:6px">🌙</button>
+    <button class="tb-logout" onclick="doLogout()">⎋ Déconnexion</button>
+  </header>
+
+  <nav class="tabs no-print">
+    <button class="tab active" id="tabBtn-reunions" onclick="switchTab('reunions')">📅 Réunions &amp; QR</button>
+    <button class="tab" id="tabBtn-presences" onclick="switchTab('presences')">👥 Présences</button>
+    <button class="tab" id="tabBtn-historique" onclick="switchTab('historique')">🗂️ Historique</button>
+    <button class="tab" id="tabBtn-membres" onclick="switchTab('membres')">💊 Personnel</button>
+    <button class="tab" id="tabBtn-stats" onclick="switchTab('stats')">📊 Statistiques</button>
+  </nav>
+
+  <div class="content">
+
+    <!-- TAB RÉUNIONS -->
+    <div id="tab-reunions" class="panel active">
+      <div class="card no-print">
+        <div class="card-title">➕ Nouvelle Réunion / Séance</div>
+        <div class="f-grid">
+          <div class="f-group">
+            <label>Intitulé *</label>
+            <input type="text" id="newLabel" placeholder="Ex : Réunion d'équipe – Janvier 2026">
+          </div>
+          <div class="f-group">
+            <label>Date *</label>
+            <input type="date" id="newDate">
+          </div>
+          <div class="f-group" style="grid-column:1/-1">
+            <label>Lieu</label>
+            <input type="text" id="newLieu" placeholder="Ex : Salle de réunion Pharmacie de la Mé">
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <button class="btn btn-primary" onclick="createReunion()">📅 Créer la réunion</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">📋 Réunions existantes</div>
+          <div class="r-list" id="rList">
+            <div class="empty-tbl"><div class="e-icon">📅</div><div class="e-title">Aucune réunion</div><div class="e-sub">Créez votre première réunion</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📲 Code QR à imprimer</div>
+          <div id="qrEmpty" class="qr-empty">
+            <div class="icon">📲</div>
+            <div class="msg">Sélectionnez une réunion<br>pour générer son QR code</div>
+          </div>
+          <div id="qrReady" style="display:none">
+            <div class="qr-area">
+              <img id="qrImg" src="" alt="QR Code" width="220" height="220">
+              <div class="qr-meta">
+                <div class="qr-reunion-name" id="qrName"></div>
+                <div class="qr-reunion-date" id="qrDate"></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap" class="no-print">
+              <button class="btn btn-outline" onclick="printQR()">🖨️ Imprimer le QR</button>
+              <button class="btn btn-primary" onclick="goToPresences()">👥 Voir les présences</button>
+              <button class="btn btn-teal" onclick="shareWhatsApp()">📱 WhatsApp</button>
+            </div>
+            <div class="divider no-print"></div>
+            <div style="font-size:11px;color:var(--grey)" class="no-print">🔗 <span id="qrUrl" style="word-break:break-all"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB PRÉSENCES -->
+    <div id="tab-presences" class="panel">
+      <div class="card no-print" style="padding:0">
+        <div class="reunion-bar">
+          <label>Réunion :</label>
+          <select id="rSelect" onchange="loadPresences()">
+            <option value="">— Choisir une réunion —</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 Feuille de présence</div>
+        <div class="tbl-actions no-print">
+          <input class="search-input" id="srch" placeholder="🔍 Rechercher…" oninput="filterTbl()">
+          <span class="count-pill" id="cntPill">0 présent</span>
+          <span id="liveIndicator" style="font-size:12px;font-weight:600;color:var(--grey)">⏳ Chargement…</span>
+          <button class="btn btn-green" onclick="exportCSV()">📊 CSV</button>
+          <button class="btn btn-outline" onclick="printPresences()">🖨️ Imprimer</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>#</th><th>NOM</th><th>Prénom</th><th>Fonction</th><th>Téléphone</th><th>Email</th><th>Heure</th><th>Signature</th><th class="no-print">Actions</th></tr>
+            </thead>
+            <tbody id="tBody">
+              <tr><td colspan="9"><div class="empty-tbl"><div class="e-icon">👥</div><div class="e-title">Sélectionnez une réunion</div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB HISTORIQUE -->
+    <div id="tab-historique" class="panel">
+      <div class="card">
+        <div class="card-title">🗂️ Historique des réunions</div>
+        <div class="no-print" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;align-items:flex-end">
+          <div class="f-group" style="margin:0;min-width:130px">
+            <label>Mois</label>
+            <select id="hMois" onchange="filterHistorique()">
+              <option value="">Tous</option>
+              <option value="01">Janvier</option><option value="02">Février</option>
+              <option value="03">Mars</option><option value="04">Avril</option>
+              <option value="05">Mai</option><option value="06">Juin</option>
+              <option value="07">Juillet</option><option value="08">Août</option>
+              <option value="09">Septembre</option><option value="10">Octobre</option>
+              <option value="11">Novembre</option><option value="12">Décembre</option>
+            </select>
+          </div>
+          <div class="f-group" style="margin:0;min-width:110px">
+            <label>Année</label>
+            <select id="hAnnee" onchange="filterHistorique()"><option value="">Toutes</option></select>
+          </div>
+          <div class="f-group" style="margin:0;flex:1;min-width:180px">
+            <label>Recherche globale (nom, prénom…)</label>
+            <input type="text" id="hSearch" placeholder="🔍 Rechercher un membre…" oninput="globalSearch()">
+          </div>
+          <span class="count-pill" id="hCount">0 réunion</span>
+        </div>
+        <div id="histoList">
+          <div class="empty-tbl"><div class="e-icon">🗂️</div><div class="e-title">Aucune réunion</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB MEMBRES / PERSONNEL -->
+    <div id="tab-membres" class="panel">
+      <div class="card no-print">
+        <div class="card-title">➕ Ajouter un membre du personnel</div>
+        <div class="f-grid">
+          <div class="f-group"><label>NOM *</label><input type="text" id="mNom" placeholder="NOM DE FAMILLE"></div>
+          <div class="f-group"><label>Prénom *</label><input type="text" id="mPrenom" placeholder="Prénom"></div>
+          <div class="f-group"><label>Fonction / Poste *</label><input type="text" id="mFonction" placeholder="Ex : Pharmacien Titulaire, Préparateur…"></div>
+          <div class="f-group"><label>Téléphone *</label><input type="tel" id="mTel" placeholder="07 00 00 00 00"></div>
+          <div class="f-group" style="grid-column:1/-1"><label>Email</label><input type="email" id="mEmail" placeholder="email@exemple.com"></div>
+        </div>
+        <div style="margin-top:14px"><button class="btn btn-primary" onclick="addMembre()">➕ Ajouter le membre</button></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">💊 Liste du personnel</div>
+        <div class="tbl-actions no-print">
+          <input class="search-input" id="mSearch" placeholder="🔍 Rechercher…" oninput="filterMembres()">
+          <span class="count-pill" id="mCount">0 membre</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>NOM</th><th>Prénom</th><th>Fonction</th><th>Téléphone</th><th>Email</th><th class="no-print">Actions</th></tr></thead>
+            <tbody id="mBody"><tr><td colspan="7"><div class="empty-tbl"><div class="e-icon">💊</div><div class="e-title">Chargement…</div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB STATS -->
+    <div id="tab-stats" class="panel">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px" id="statsKPIs">
+        <div class="card" style="text-align:center;padding:20px">
+          <div style="font-size:36px;font-weight:900;color:var(--primary)" id="st-total-reunions">–</div>
+          <div style="font-size:13px;color:var(--grey);margin-top:4px">Réunions tenues</div>
+        </div>
+        <div class="card" style="text-align:center;padding:20px">
+          <div style="font-size:36px;font-weight:900;color:var(--accent2)" id="st-total-presences">–</div>
+          <div style="font-size:13px;color:var(--grey);margin-top:4px">Présences enregistrées</div>
+        </div>
+        <div class="card" style="text-align:center;padding:20px">
+          <div style="font-size:36px;font-weight:900;color:#d97706" id="st-moy-presences">–</div>
+          <div style="font-size:13px;color:var(--grey);margin-top:4px">Présences moy. / réunion</div>
+        </div>
+        <div class="card" style="text-align:center;padding:20px">
+          <div style="font-size:36px;font-weight:900;color:#3340CC" id="st-membres-uniques">–</div>
+          <div style="font-size:13px;color:var(--grey);margin-top:4px">Membres uniques</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="justify-content:space-between">
+          <span>🏆 Top personnel (présences)</span>
+          <button class="btn btn-red btn-sm no-print" onclick="purgerPresencesOrphelines()" title="Supprimer les présences dont le membre a été effacé">🧹 Purger noms supprimés</button>
+        </div>
+        <div id="st-top-membres"><div class="empty-tbl"><div class="e-icon">📊</div><div class="e-title">Chargement…</div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📅 Présences par réunion</div>
+        <div id="st-par-reunion"><div class="empty-tbl"><div class="e-icon">📊</div><div class="e-title">Chargement…</div></div></div>
+      </div>
+    </div>
+
+  </div>
+
+
+</div>
+
+<!-- MODAL ÉDITION -->
+<div class="modal-bg no-print" id="editBg">
+  <div class="modal">
+    <div class="modal-title">✏️ Modifier la présence</div>
+    <input type="hidden" id="eId">
+    <div class="f-grid">
+      <div class="f-group"><label>Prénom *</label><input type="text" id="e-prenom"></div>
+      <div class="f-group"><label>Nom *</label><input type="text" id="e-nom"></div>
+      <div class="f-group"><label>Fonction *</label><input type="text" id="e-fonction"></div>
+      <div class="f-group"><label>Téléphone *</label><input type="tel" id="e-telephone"></div>
+      <div class="f-group" style="grid-column:1/-1"><label>Email</label><input type="email" id="e-email"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveEdit()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// SHA-256 helper
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// ⚙️  CONFIGURATION  —  MODIFIEZ CES VALEURS
+// Créez un projet Firebase distinct : "pharma-me-presences"
+// ═══════════════════════════════════════════════════════
+const CONFIG = {
+  // SHA-256 de votre mot de passe admin
+  // Générez-le ici : https://emn178.github.io/online-tools/sha256.html
+  passwordHash: "2fdbef016a99451c09cae1a8ec8c6654e025fb049e58069b3a17798e3036a721",
+  // URL de votre dépôt GitHub Pages dédié à la pharmacie
+  baseUrl:      "https://marcelero.github.io/pharma-me-presences",
+  scanFile:     "scan-pharma.html",
+  orgName:      "Pharmacie de la Mé",
+  orgFullName:  "Pharmacie de la Mé – Gestion des présences"
+};
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyA2OopKBLbbXrVNzyP4lFKRfSsdceZdNxY",
+  authDomain:        "pharma-me-presences.firebaseapp.com",
+  projectId:         "pharma-me-presences",
+  storageBucket:     "pharma-me-presences.firebasestorage.app",
+  messagingSenderId: "1024602522293",
+  appId:             "1:1024602522293:web:5168612b11ef0b6092f4fc"
+};
+// ═══════════════════════════════════════════════════════
+
+const FB_CONFIGURED = !Object.values(firebaseConfig).some(v => v.includes('VOTRE'));
+
+let db = null;
+
+function loadFirebase() {
+  return new Promise((resolve, reject) => {
+    if (!FB_CONFIGURED) { reject(new Error('not_configured')); return; }
+    const s1 = document.createElement('script');
+    s1.src = 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js';
+    s1.onload = () => {
+      const s2 = document.createElement('script');
+      s2.src = 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js';
+      s2.onload = () => {
+        try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); resolve(); }
+        catch(e) { reject(e); }
+      };
+      s2.onerror = reject;
+      document.head.appendChild(s2);
+    };
+    s1.onerror = reject;
+    document.head.appendChild(s1);
+  });
+}
+
+async function doLogin() {
+  const inp  = document.getElementById('pwdInput');
+  const hash = await sha256(inp.value);
+  if (hash !== CONFIG.passwordHash) {
+    inp.classList.add('shake');
+    setTimeout(()=>inp.classList.remove('shake'), 400);
+    document.getElementById('loginErr').textContent = '❌ Mot de passe incorrect';
+    inp.value = ''; return;
+  }
+  sessionStorage.setItem('pharmaauth','1');
+  document.getElementById('loginScreen').style.display = 'none';
+  startApp();
+}
+
+function doLogout() { sessionStorage.removeItem('pharmaauth'); location.reload(); }
+
+async function startApp() {
+  try {
+    await loadFirebase();
+    document.getElementById('appScreen').style.display = 'block';
+    initApp();
+  } catch(e) {
+    document.getElementById('setupBanner').style.display = 'block';
+  }
+}
+
+if (sessionStorage.getItem('pharmaauth') === '1') {
+  document.getElementById('loginScreen').style.display = 'none';
+  startApp();
+}
+
+let reunions = [], selectedR = null, presences = [], presenceUnsub = null, autoRefreshTimer = null;
+
+function initApp() {
+  document.getElementById('newDate').valueAsDate = new Date();
+  if (localStorage.getItem('pharma_dark') === '1') {
+    document.body.classList.add('dark');
+    document.getElementById('darkBtn').textContent = '☀️';
+  }
+  loadReunions();
+}
+
+function switchTab(name) {
+  ['reunions','presences','historique','membres','stats'].forEach(n => {
+    document.getElementById('tab-'+n).classList.toggle('active', n===name);
+    document.getElementById('tabBtn-'+n).classList.toggle('active', n===name);
+  });
+  if (name==='presences') { fillRSelect(); }
+  if (name==='historique') { buildHistorique(); }
+  if (name==='stats') { buildStats(); }
+  if (name==='membres') { loadMembres(); }
+  if (name==='reunions') {
+    if (presenceUnsub) { presenceUnsub(); presenceUnsub=null; }
+    if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer=null; }
+  }
+}
+
+function goToPresences() {
+  switchTab('presences');
+  setTimeout(()=>{ if(selectedR){document.getElementById('rSelect').value=selectedR.id; loadPresences();} }, 50);
+}
+
+function buildScanUrl(id) { return `${CONFIG.baseUrl}/${CONFIG.scanFile}?reunion=${id}`; }
+function buildQrImageUrl(data) {
+  return `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data)}&size=220x220&color=3340CC&margin=10`;
+}
+
+async function loadReunions() {
+  try {
+    const snap = await db.collection('pharma_reunions').orderBy('date','desc').get();
+    reunions = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderRList();
+  } catch(e) { toast('Erreur de chargement','err'); }
+}
+
+function renderRList() {
+  const el = document.getElementById('rList');
+  if (!reunions.length) {
+    el.innerHTML=`<div class="empty-tbl"><div class="e-icon">📅</div><div class="e-title">Aucune réunion</div><div class="e-sub">Créez votre première réunion ci-dessus</div></div>`;
+    return;
+  }
+  const today    = new Date(); today.setHours(0,0,0,0);
+  const limitOld = new Date(today); limitOld.setDate(limitOld.getDate() - 30);
+  const recent   = reunions.filter(r => r.date && new Date(r.date+'T00:00:00') >= limitOld);
+  const ancient  = reunions.filter(r => !r.date || new Date(r.date+'T00:00:00') < limitOld);
+
+  function renderItem(r) {
+    const ds  = r.date ? new Date(r.date+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '';
+    const sel = selectedR?.id===r.id ? 'sel' : '';
+    return `<div class="r-item ${sel}" onclick="selectR('${r.id}')">
+      <div class="r-dot"></div>
+      <div class="r-info"><div class="r-label">${esc(r.label)}</div><div class="r-date">📅 ${ds}</div></div>
+      <span class="r-count" id="rc-${r.id}">…</span>
+      <span class="r-del" onclick="event.stopPropagation();delR('${r.id}')">🗑️</span>
+    </div>`;
+  }
+  function sectionLabel(text, color) {
+    return `<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:${color};margin:12px 0 6px;padding:0 4px">${text}</div>`;
+  }
+  let html = '';
+  if (recent.length)  html += sectionLabel('🟢 Réunions récentes (30 derniers jours)', '#059669') + recent.map(renderItem).join('');
+  if (ancient.length) html += sectionLabel('🗂️ Anciennes réunions', '#94a3b8') + ancient.map(renderItem).join('');
+  el.innerHTML = html;
+  reunions.forEach(r=>getCount(r.id));
+}
+
+async function getCount(id) {
+  const snap = await db.collection('pharma_presences').where('reunionId','==',id).get();
+  const el = document.getElementById('rc-'+id);
+  if (el) el.textContent = snap.size+' présent'+(snap.size>1?'s':'');
+}
+
+async function createReunion() {
+  const label = document.getElementById('newLabel').value.trim();
+  const date  = document.getElementById('newDate').value;
+  if (!label||!date) { toast('Renseignez l\'intitulé et la date','err'); return; }
+  try {
+    const lieu = document.getElementById('newLieu').value.trim();
+    const ref = await db.collection('pharma_reunions').add({
+      label, date, lieu, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('newLabel').value='';
+    document.getElementById('newLieu').value='';
+    toast('Réunion créée ✅','ok');
+    await loadReunions();
+    selectR(ref.id);
+  } catch(e) { toast('Erreur de création','err'); }
+}
+
+function selectR(id) {
+  selectedR = reunions.find(r=>r.id===id);
+  renderRList();
+  renderQR();
+}
+
+function renderQR() {
+  if (!selectedR) return;
+  const url = buildScanUrl(selectedR.id);
+  document.getElementById('qrEmpty').style.display='none';
+  document.getElementById('qrReady').style.display='block';
+  document.getElementById('qrName').textContent = selectedR.label||'Réunion Pharmacie de la Mé';
+  document.getElementById('qrUrl').textContent  = url;
+  document.getElementById('qrImg').src = buildQrImageUrl(url);
+  const ds   = selectedR.date ? new Date(selectedR.date+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '';
+  const lieu = selectedR.lieu ? ` · 📍 ${selectedR.lieu}` : '';
+  document.getElementById('qrDate').textContent = ds + lieu;
+}
+
+async function delR(id) {
+  if (!confirm('Supprimer cette réunion et toutes ses présences ?')) return;
+  try {
+    const snap = await db.collection('pharma_presences').where('reunionId','==',id).get();
+    const batch = db.batch();
+    snap.docs.forEach(d => batch.delete(d.ref));
+    batch.delete(db.collection('pharma_reunions').doc(id));
+    await batch.commit();
+    if (selectedR?.id===id) {
+      selectedR=null;
+      document.getElementById('qrEmpty').style.display='block';
+      document.getElementById('qrReady').style.display='none';
+    }
+    histoPresences = {}; // vider le cache Historique
+    await loadReunions();
+    toast(`Réunion et ${snap.size} présence(s) supprimées`,'ok');
+  } catch(e) { toast('Erreur de suppression','err'); }
+}
+
+function fillRSelect() {
+  const sel = document.getElementById('rSelect');
+  sel.innerHTML='<option value="">— Choisir une réunion —</option>';
+  reunions.forEach(r=>{
+    const ds=r.date?new Date(r.date+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}):''
+    sel.innerHTML+=`<option value="${r.id}">${esc(r.label)} – ${ds}</option>`;
+  });
+  if (selectedR) sel.value=selectedR.id;
+}
+
+async function loadPresences() {
+  const rid = document.getElementById('rSelect').value;
+  if (!rid) { presences=[]; renderPresences(); return; }
+  if (presenceUnsub) { presenceUnsub(); presenceUnsub = null; }
+  if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
+
+  async function fetchNow() {
+    try {
+      const snap = await db.collection('pharma_presences').where('reunionId','==',rid).get();
+      presences = snap.docs.map(d=>({id:d.id,...d.data()}));
+      presences.sort((a,b)=>(a.dateSignature||'').localeCompare(b.dateSignature||''));
+      renderPresences();
+      updateLiveIndicator(true);
+    } catch(e) { updateLiveIndicator(false); }
+  }
+  await fetchNow();
+  try {
+    presenceUnsub = db.collection('pharma_presences')
+      .where('reunionId','==',rid)
+      .onSnapshot(snap=>{
+        presences=snap.docs.map(d=>({id:d.id,...d.data()}));
+        presences.sort((a,b)=>(a.dateSignature||'').localeCompare(b.dateSignature||''));
+        renderPresences();
+        updateLiveIndicator(true);
+      }, ()=>{ updateLiveIndicator(false); });
+  } catch(e) {}
+  autoRefreshTimer = setInterval(fetchNow, 15000);
+}
+
+function updateLiveIndicator(online) {
+  const el = document.getElementById('liveIndicator');
+  if (!el) return;
+  el.textContent = online ? '🟢 Temps réel actif' : '🔴 Hors ligne';
+  el.style.color  = online ? 'var(--green)' : 'var(--red)';
+}
+
+function renderPresences(filter='') {
+  const tbody=document.getElementById('tBody');
+  const f=filter.toLowerCase();
+  const list=presences.filter(p=>!f||(p.prenom+' '+p.nom+' '+p.fonction+' '+p.telephone+' '+(p.email||'')).toLowerCase().includes(f));
+  const cnt=list.length;
+  document.getElementById('cntPill').textContent=cnt+' présent'+(cnt>1?'s':'');
+  if (!list.length) {
+    tbody.innerHTML=`<tr><td colspan="9"><div class="empty-tbl">
+      <div class="e-icon">👥</div>
+      <div class="e-title">${presences.length?'Aucun résultat':'Aucune présence enregistrée'}</div>
+      <div class="e-sub">${presences.length?'Affinez votre recherche':'Les membres scannent le QR pour apparaître ici'}</div>
+    </div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML=list.map((p,i)=>{
+    const h=p.dateSignature?new Date(p.dateSignature).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'–';
+    const sigHtml=p.signature
+      ?`<img src="${p.signature}" style="height:38px;max-width:100px;border:1px solid #e2e8f0;border-radius:6px;background:#fff">`
+      :'<span style="color:#cbd5e1;font-size:11px">—</span>';
+    return `<tr>
+      <td style="color:var(--grey);font-weight:600">${i+1}</td>
+      <td><strong>${esc((p.nom||'').toUpperCase())}</strong></td><td>${esc(p.prenom)}</td>
+      <td>${esc(p.fonction)}</td><td>${esc(p.telephone)}</td>
+      <td style="color:var(--grey)">${esc(p.email||'–')}</td>
+      <td style="color:var(--grey)">${h}</td>
+      <td>${sigHtml}</td>
+      <td class="no-print"><div class="td-actions">
+        <button class="btn btn-outline btn-xs" onclick="openEdit('${p.id}')">✏️</button>
+        <button class="btn btn-red btn-xs" onclick="delP('${p.id}')">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterTbl() { renderPresences(document.getElementById('srch').value); }
+
+function openEdit(id) {
+  const p=presences.find(x=>x.id===id); if(!p)return;
+  document.getElementById('eId').value=id;
+  ['prenom','nom','fonction','telephone','email'].forEach(k=>document.getElementById('e-'+k).value=p[k]||'');
+  document.getElementById('editBg').classList.add('show');
+}
+function closeModal() { document.getElementById('editBg').classList.remove('show'); }
+
+async function saveEdit() {
+  const id=document.getElementById('eId').value;
+  const d={prenom:document.getElementById('e-prenom').value.trim(),nom:document.getElementById('e-nom').value.trim(),
+    fonction:document.getElementById('e-fonction').value.trim(),telephone:document.getElementById('e-telephone').value.trim(),
+    email:document.getElementById('e-email').value.trim(),modifiedAt:new Date().toISOString()};
+  if(!d.prenom||!d.nom||!d.fonction||!d.telephone){toast('Champs obligatoires manquants','err');return;}
+  try { await db.collection('pharma_presences').doc(id).update(d); closeModal(); toast('Mise à jour ✅','ok'); }
+  catch(e){toast('Erreur','err');}
+}
+
+async function delP(id) {
+  if (!confirm('Supprimer cette présence ?')) return;
+  try {
+    await db.collection('pharma_presences').doc(id).delete();
+    presences = presences.filter(p => p.id !== id);
+    renderPresences(document.getElementById('srch')?.value || '');
+    histoPresences = {};
+    toast('Supprimé ✅','ok');
+  }
+  catch(e){toast('Erreur','err');}
+}
+
+function exportCSV() {
+  if (!presences.length){toast('Aucune donnée à exporter','err');return;}
+  const rid=document.getElementById('rSelect').value;
+  const reunion=reunions.find(r=>r.id===rid);
+  const headers=['#','NOM','Prénom','Fonction','Téléphone','Email','Heure de présence'];
+  const rows=presences.map((p,i)=>{
+    const h=p.dateSignature?new Date(p.dateSignature).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';
+    return [i+1,(p.nom||'').toUpperCase(),p.prenom||'',p.fonction||'',p.telephone||'',p.email||'',h];
+  });
+  const sep='\t';
+  const lines=[headers,...rows].map(r=>r.map(c=>String(c).replace(/\t/g,' ').replace(/\r?\n/g,' ')).join(sep));
+  const blob=new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=UTF-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`Presences_PharmaMé_${reunion?.date||new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('Export CSV téléchargé ✅','ok');
+}
+
+function printQR() {
+  if (!selectedR) return;
+  const url=buildScanUrl(selectedR.id);
+  const qrUrl=buildQrImageUrl(url);
+  const ds=selectedR.date?new Date(selectedR.date+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>QR – ${esc(selectedR.label)}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Outfit',Arial,sans-serif;background:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh}
+    .card{border:3px solid #3340CC;border-radius:20px;padding:40px;text-align:center;max-width:420px;width:100%}
+    .logo{width:70px;height:70px;background:#4550E5;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+    .logo svg{width:54px;height:54px}
+    .org{font-size:22px;font-weight:900;color:#3340CC}
+    .org-sub{font-size:11px;color:#666;margin:4px 0 24px}
+    .qr{width:220px;height:220px;display:block;margin:0 auto}
+    .m-name{font-size:17px;font-weight:700;color:#3340CC;margin-top:22px}
+    .m-date{font-size:13px;color:#555;margin-top:6px;text-transform:capitalize}
+    .instr{margin-top:18px;background:#eef2ff;border-radius:12px;padding:14px;font-size:14px;color:#3340CC;font-weight:600}
+    .credit{margin-top:16px;font-size:10px;color:#94a3b8}
+    @media print{@page{margin:15mm}}
+  </style></head><body>
+  <div class="card">
+    <div class="logo"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="18" r="16" fill="#4ECDC4"/>
+      <circle cx="18" cy="50" r="16" fill="#4ECDC4"/>
+      <circle cx="50" cy="50" r="16" fill="#4ECDC4"/>
+      <circle cx="82" cy="50" r="16" fill="#4ECDC4"/>
+      <circle cx="50" cy="82" r="16" fill="#4ECDC4"/>
+    </svg></div>
+    <div class="org">Pharmacie de la Mé</div>
+    <div class="org-sub">Gestion des présences numériques</div>
+    <img class="qr" src="${qrUrl}" alt="QR Code" onload="window.print()">
+    <div class="m-name">${esc(selectedR.label)}</div>
+    <div class="m-date">📅 ${ds}</div>
+    <div class="instr">📱 Scannez avec votre téléphone<br>pour enregistrer votre présence</div>
+
+  </div>
+  </body></html>`);
+  w.document.close();
+}
+
+function printPresences() {
+  if (!presences.length){toast('Aucune présence à imprimer','err');return;}
+  const rid=document.getElementById('rSelect').value;
+  const reunion=reunions.find(r=>r.id===rid);
+  const ds=reunion?.date?new Date(reunion.date+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
+  const rows=presences.map((p,i)=>{
+    const h=p.dateSignature?new Date(p.dateSignature).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'–';
+    const sigCell=p.signature?`<img src="${p.signature}" style="height:36px;max-width:90px">`:'&nbsp;';
+    return `<tr><td>${i+1}</td><td>${esc(p.prenom)}</td><td>${esc(p.nom)}</td><td>${esc(p.fonction)}</td><td>${esc(p.telephone)}</td><td>${esc(p.email||'–')}</td><td>${h}</td><td>${sigCell}</td></tr>`;
+  }).join('');
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    @page{size:A4 landscape;margin:10mm 12mm}
+    body{font-family:'Outfit',Arial,sans-serif;padding:16px;font-size:11px}
+    .header{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:6px}
+    .logo-sq{width:52px;height:52px;background:#4550E5;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .logo-sq svg{width:42px;height:42px}
+    .org{font-size:16px;font-weight:900;color:#3340CC}
+    .org-sub{font-size:10px;color:#555}
+    .meta{text-align:center;font-size:11px;color:#333;margin-bottom:14px;text-transform:capitalize;padding-bottom:10px;border-bottom:2px solid #4550E5}
+    table{width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed}
+    th{background:#3340CC;color:#fff;padding:7px 6px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.4px}
+    td{padding:6px;border-bottom:1px solid #e5e7eb;vertical-align:middle;overflow:hidden;word-break:break-word}
+    tr:nth-child(even) td{background:#f8faff}
+    td img{max-height:40px;max-width:100%;display:block}
+    .foot{margin-top:16px;display:flex;justify-content:space-between;font-size:10px;color:#555}
+    .credit{text-align:center;margin-top:10px;font-size:9px;color:#94a3b8}
+    .sigs{margin-top:30px;display:flex;justify-content:space-between}
+    .sig-line{border-top:1px solid #000;width:150px;text-align:center;padding-top:5px;font-size:10px}
+  </style></head><body>
+  <div class="header">
+    <div class="logo-sq"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="18" r="16" fill="#4ECDC4"/>
+      <circle cx="18" cy="50" r="16" fill="#4ECDC4"/>
+      <circle cx="50" cy="50" r="16" fill="#4ECDC4"/>
+      <circle cx="82" cy="50" r="16" fill="#4ECDC4"/>
+      <circle cx="50" cy="82" r="16" fill="#4ECDC4"/>
+    </svg></div>
+    <div><div class="org">Pharmacie de la Mé</div><div class="org-sub">Feuille de présence officielle</div></div>
+  </div>
+  <div class="meta">📅 ${ds} &nbsp;|&nbsp; ${esc(reunion?.label)}</div>
+  <table>
+    <colgroup><col style="width:4%"><col style="width:11%"><col style="width:12%"><col style="width:14%"><col style="width:11%"><col style="width:13%"><col style="width:7%"><col style="width:28%"></colgroup>
+    <thead><tr><th>#</th><th>Prénom</th><th>NOM</th><th>Fonction</th><th>Téléphone</th><th>Email</th><th>Heure</th><th>Signature</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="foot"><span>Total : <strong>${presences.length} présent(s)</strong></span><span>Édité le ${new Date().toLocaleDateString('fr-FR')}</span></div>
+  <div class="sigs"><div class="sig-line">Le Responsable</div><div class="sig-line">Le Titulaire</div></div>
+
+  <script>window.onload=()=>window.print()<\/script>
+  </body></html>`);
+  w.document.close();
+}
+
+// ══ HISTORIQUE ══
+let histoPresences = {};
+
+async function buildHistorique() {
+  const years = [...new Set(reunions.map(r => r.date?.slice(0,4)).filter(Boolean))].sort((a,b)=>b-a);
+  const selAn = document.getElementById('hAnnee');
+  const prevY = selAn.value;
+  selAn.innerHTML = '<option value="">Toutes</option>' + years.map(y=>`<option value="${y}"${y===prevY?' selected':''}>${y}</option>`).join('');
+  filterHistorique();
+}
+
+async function filterHistorique() {
+  const mois  = document.getElementById('hMois').value;
+  const annee = document.getElementById('hAnnee').value;
+  let filtered = [...reunions];
+  if (annee) filtered = filtered.filter(r => r.date?.startsWith(annee));
+  if (mois)  filtered = filtered.filter(r => r.date?.slice(5,7) === mois);
+  filtered.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  document.getElementById('hCount').textContent = filtered.length + ' réunion' + (filtered.length>1?'s':'');
+  const el = document.getElementById('histoList');
+  if (!filtered.length) { el.innerHTML = `<div class="empty-tbl"><div class="e-icon">🗂️</div><div class="e-title">Aucune réunion pour cette période</div></div>`; return; }
+  el.innerHTML = filtered.map(r => {
+    const ds = r.date ? new Date(r.date+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '';
+    return `<div class="histo-item" id="hi-${r.id}">
+      <div class="histo-head" onclick="toggleHisto('${r.id}')">
+        <div><div style="font-size:14px;font-weight:700;color:#0f172a">${esc(r.label)}</div><div style="font-size:12px;color:var(--grey);margin-top:2px;text-transform:capitalize">📅 ${ds}</div></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="r-count" id="hc-${r.id}">…</span>
+          <span style="color:var(--grey);font-size:18px" id="hArrow-${r.id}">›</span>
+        </div>
+      </div>
+      <div class="histo-body" id="hb-${r.id}" style="display:none">
+        <div style="display:flex;gap:8px;margin-bottom:12px" class="no-print">
+          <button class="btn btn-outline btn-sm" onclick="printHisto('${r.id}')">🖨️ Imprimer</button>
+          <button class="btn btn-green btn-sm" onclick="exportHistoCSV('${r.id}')">📊 CSV</button>
+        </div>
+        <div id="ht-${r.id}"><div style="text-align:center;padding:20px;color:#94a3b8">⏳ Chargement…</div></div>
+      </div>
+    </div>`;
+  }).join('');
+  filtered.forEach(r => getHistoCount(r.id));
+}
+
+async function getHistoCount(id) {
+  const snap = await db.collection('pharma_presences').where('reunionId','==',id).get();
+  const el = document.getElementById('hc-'+id);
+  if (el) el.textContent = snap.size + ' présent' + (snap.size>1?'s':'');
+}
+
+async function globalSearch() {
+  const q = document.getElementById('hSearch').value.trim().toLowerCase();
+  if (!q) { filterHistorique(); return; }
+  const el = document.getElementById('histoList');
+  el.innerHTML = '<div style="text-align:center;padding:30px;color:#94a3b8">⏳ Recherche en cours…</div>';
+  try {
+    const snap = await db.collection('pharma_presences').get();
+    const all  = snap.docs.map(d=>({id:d.id,...d.data()}));
+    const matches = all.filter(p =>
+      (p.nom||'').toLowerCase().includes(q) || (p.prenom||'').toLowerCase().includes(q) ||
+      (p.fonction||'').toLowerCase().includes(q) || (p.telephone||'').includes(q)
+    );
+    if (!matches.length) {
+      el.innerHTML = '<div class="empty-tbl"><div class="e-icon">🔍</div><div class="e-title">Aucun résultat</div></div>';
+      document.getElementById('hCount').textContent = '0 résultat'; return;
+    }
+    const byR = {};
+    matches.forEach(p => { if (!byR[p.reunionId]) byR[p.reunionId] = []; byR[p.reunionId].push(p); });
+    let html = '';
+    for (const [rid, list] of Object.entries(byR)) {
+      const reunion = reunions.find(r=>r.id===rid);
+      const label   = reunion?.label || 'Réunion inconnue';
+      const ds      = reunion?.date ? new Date(reunion.date+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '';
+      const rows    = list.map((p,i) => {
+        const h = p.dateSignature ? new Date(p.dateSignature).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '–';
+        return `<tr><td>${i+1}</td><td><strong>${esc((p.nom||'').toUpperCase())}</strong></td><td>${esc(p.prenom)}</td><td>${esc(p.fonction)}</td><td>${esc(p.telephone)}</td><td>${h}</td></tr>`;
+      }).join('');
+      html += `<div class="histo-item" style="margin-bottom:10px">
+        <div class="histo-head" style="cursor:default">
+          <div><div style="font-size:14px;font-weight:700">${esc(label)}</div><div style="font-size:12px;color:var(--grey)">📅 ${ds}</div></div>
+          <span class="r-count">${list.length} résultat(s)</span>
+        </div>
+        <div class="histo-body"><div class="table-wrap"><table>
+          <thead><tr><th>#</th><th>NOM</th><th>Prénom</th><th>Fonction</th><th>Téléphone</th><th>Heure</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div></div>
+      </div>`;
+    }
+    el.innerHTML = html;
+    document.getElementById('hCount').textContent = `${matches.length} résultat(s) dans ${Object.keys(byR).length} réunion(s)`;
+  } catch(e) { el.innerHTML = '<div class="empty-tbl"><div class="e-icon">❌</div><div class="e-title">Erreur de recherche</div></div>'; }
+}
+
+async function toggleHisto(id) {
+  const body  = document.getElementById('hb-'+id);
+  const arrow = document.getElementById('hArrow-'+id);
+  const isOpen = body.style.display === 'block';
+  if (isOpen) { body.style.display='none'; arrow.textContent='›'; return; }
+  body.style.display='block'; arrow.textContent='⌄';
+  if (!histoPresences[id]) {
+    const snap = await db.collection('pharma_presences').where('reunionId','==',id).get();
+    histoPresences[id] = snap.docs.map(d=>({id:d.id,...d.data()}));
+    histoPresences[id].sort((a,b)=>(a.dateSignature||'').localeCompare(b.dateSignature||''));
+  }
+  renderHistoTable(id);
+}
+
+function renderHistoTable(rid) {
+  const list = histoPresences[rid] || [];
+  const el   = document.getElementById('ht-'+rid);
+  if (!list.length) { el.innerHTML=`<div style="text-align:center;padding:20px;color:#94a3b8">Aucune présence</div>`; return; }
+  const rows=list.map((p,i)=>{
+    const h=p.dateSignature?new Date(p.dateSignature).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'–';
+    const sigHtml=p.signature?`<img src="${p.signature}" style="height:34px;max-width:90px;border:1px solid #e2e8f0;border-radius:4px">`:'–';
+    return `<tr><td style="color:var(--grey);font-weight:600">${i+1}</td><td><strong>${esc((p.nom||'').toUpperCase())}</strong></td><td>${esc(p.prenom)}</td><td>${esc(p.fonction)}</td><td>${esc(p.telephone)}</td><td style="color:var(--grey)">${esc(p.email||'–')}</td><td style="color:var(--grey)">${h}</td><td>${sigHtml}</td></tr>`;
+  }).join('');
+  el.innerHTML=`<div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>NOM</th><th>Prénom</th><th>Fonction</th><th>Téléphone</th><th>Email</th><th>Heure</th><th>Signature</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+function printHisto(rid) {
+  const reunion=reunions.find(r=>r.id===rid);
+  const list=histoPresences[rid]||[];
+  if (!list.length){toast('Aucune présence à imprimer','err');return;}
+  const ds=reunion?.date?new Date(reunion.date+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
+  const rows=list.map((p,i)=>{
+    const h=p.dateSignature?new Date(p.dateSignature).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'–';
+    const sig=p.signature?`<img src="${p.signature}" style="height:36px;max-width:90px">`:'&nbsp;';
+    return `<tr><td>${i+1}</td><td>${esc(p.prenom)}</td><td>${esc(p.nom)}</td><td>${esc(p.fonction)}</td><td>${esc(p.telephone)}</td><td>${esc(p.email||'–')}</td><td>${h}</td><td>${sig}</td></tr>`;
+  }).join('');
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    @page{size:A4 landscape;margin:10mm 12mm}
+    body{font-family:Arial,sans-serif;font-size:11px;padding:16px}
+    .meta{text-align:center;margin-bottom:14px;border-bottom:2px solid #3340CC;padding-bottom:10px;font-size:12px}
+    table{width:100%;border-collapse:collapse;font-size:10px}
+    th{background:#3340CC;color:#fff;padding:6px}td{padding:5px 6px;border-bottom:1px solid #e5e7eb;vertical-align:middle}
+    td img{max-height:36px}
+    .credit{text-align:center;margin-top:12px;font-size:9px;color:#94a3b8}
+  </style></head><body>
+  <div class="meta"><strong>Pharmacie de la Mé</strong> — ${esc(reunion?.label)} — 📅 ${ds}</div>
+  <table><thead><tr><th>#</th><th>Prénom</th><th>NOM</th><th>Fonction</th><th>Téléphone</th><th>Email</th><th>Heure</th><th>Signature</th></tr></thead><tbody>${rows}</tbody></table>
+
+  <script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.close();
+}
+
+function exportHistoCSV(rid) {
+  const reunion=reunions.find(r=>r.id===rid);
+  const list=histoPresences[rid]||[];
+  if (!list.length){toast('Aucune présence','err');return;}
+  const headers=['#','NOM','Prénom','Fonction','Téléphone','Email','Heure'];
+  const rows=list.map((p,i)=>{
+    const h=p.dateSignature?new Date(p.dateSignature).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';
+    return [i+1,(p.nom||'').toUpperCase(),p.prenom||'',p.fonction||'',p.telephone||'',p.email||'',h];
+  });
+  const sep='\t';
+  const csv=[headers,...rows].map(r=>r.map(c=>String(c).replace(/\t/g,' ')).join(sep)).join('\r\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=UTF-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`Presences_PharmaMé_${reunion?.date||'export'}.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('Export CSV ✅','ok');
+}
+
+// ══ MEMBRES ══
+let membres = [];
+
+async function loadMembres() {
+  try {
+    const snap = await db.collection('pharma_membres').orderBy('nom','asc').get();
+    membres = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderMembres();
+  } catch(e) { toast('Erreur chargement personnel','err'); }
+}
+
+function renderMembres(filter='') {
+  const f=filter.toLowerCase();
+  const list=membres.filter(m=>!f||(m.nom+' '+m.prenom+' '+m.fonction).toLowerCase().includes(f));
+  document.getElementById('mCount').textContent=list.length+' membre'+(list.length>1?'s':'');
+  const tbody=document.getElementById('mBody');
+  if (!list.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty-tbl"><div class="e-icon">💊</div><div class="e-title">${membres.length?'Aucun résultat':'Aucun membre'}</div></div></td></tr>`;return;}
+  tbody.innerHTML=list.map((m,i)=>`<tr>
+    <td style="color:var(--grey);font-weight:600">${i+1}</td>
+    <td><strong>${esc((m.nom||'').toUpperCase())}</strong></td>
+    <td>${esc(m.prenom)}</td><td>${esc(m.fonction)}</td>
+    <td>${esc(m.telephone)}</td><td style="color:var(--grey)">${esc(m.email||'–')}</td>
+    <td class="no-print"><div class="td-actions">
+      <button class="btn btn-red btn-xs" onclick="delMembre('${m.id}')">🗑️</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function filterMembres() { renderMembres(document.getElementById('mSearch').value); }
+
+async function addMembre() {
+  const nom=document.getElementById('mNom').value.trim().toUpperCase();
+  const prenom=document.getElementById('mPrenom').value.trim();
+  const fonction=document.getElementById('mFonction').value.trim();
+  const telephone=document.getElementById('mTel').value.trim();
+  const email=document.getElementById('mEmail').value.trim();
+  if(!nom||!prenom||!fonction||!telephone){toast('Champs obligatoires manquants','err');return;}
+  try {
+    await db.collection('pharma_membres').add({nom,prenom,fonction,telephone,email,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    ['mNom','mPrenom','mFonction','mTel','mEmail'].forEach(id=>document.getElementById(id).value='');
+    toast('Membre ajouté ✅','ok');
+    await loadMembres();
+  } catch(e){toast('Erreur d\'ajout','err');}
+}
+
+async function delMembre(id) {
+  const mSnap = await db.collection('pharma_membres').doc(id).get();
+  const m = mSnap.exists ? mSnap.data() : null;
+  const tel = (m?.telephone||'').trim();
+  const nomLabel = m ? `${(m.nom||'').toUpperCase()} ${m.prenom||''}`.trim() : 'ce membre';
+  if(!confirm(`Supprimer "${nomLabel}" ?\n\nOK = supprimer aussi toutes ses présences enregistrées.\nAnnuler = ne pas supprimer.`)) return;
+  try {
+    await db.collection('pharma_membres').doc(id).delete();
+    let presSnap;
+    if(tel) presSnap = await db.collection('pharma_presences').where('telephone','==',tel).get();
+    else if(m) presSnap = await db.collection('pharma_presences').where('nom','==',m.nom||'').get();
+    if(presSnap && !presSnap.empty){
+      const batch=db.batch();
+      presSnap.docs.forEach(d=>batch.delete(d.ref));
+      await batch.commit();
+      toast(`"${nomLabel}" supprimé avec ${presSnap.size} présence(s) ✅`,'ok');
+    } else { toast(`Membre supprimé (aucune présence associée) ✅`,'ok'); }
+    histoPresences = {};
+    await loadMembres();
+  } catch(e){ console.error(e); toast('Erreur de suppression','err'); }
+}
+
+// ══ STATISTIQUES ══
+
+function normalize(str) {
+  return (str||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase().replace(/[-'\s]+/g,' ').trim();
+}
+
+async function purgerPresencesOrphelines() {
+  if(!confirm('Purger les présences de TEST ?\n\n⚠️ Seules les présences dont NI le téléphone NI le nom ne correspond à un membre connu seront supprimées.\n\nLes membres ayant saisi manuellement mais dont le nom est reconnu sont CONSERVÉS.')) return;
+  try {
+    const mSnap = await db.collection('pharma_membres').get({source:'server'});
+    const membres = mSnap.docs.map(d=>d.data());
+    const telActifs = new Set(membres.map(m=>(m.telephone||'').replace(/\s/g,'')).filter(Boolean));
+    const nomActifsNorm = new Set(membres.map(m=>normalize(m.nom)).filter(Boolean));
+    const fullNameActifs = new Set(membres.map(m=>normalize(`${m.nom||''} ${m.prenom||''}`)).filter(Boolean));
+    const pSnap = await db.collection('pharma_presences').get({source:'server'});
+    const aSupprimer = pSnap.docs.filter(d=>{
+      const p=d.data();
+      const tel=(p.telephone||'').replace(/\s/g,'');
+      const nomNorm=normalize(p.nom||'');
+      const fullNorm=normalize(`${p.nom||''} ${p.prenom||''}`);
+      if(tel && telActifs.has(tel)) return false;
+      if(nomNorm && nomActifsNorm.has(nomNorm)) return false;
+      if(fullNorm && fullNameActifs.has(fullNorm)) return false;
+      return true;
+    });
+    if(!aSupprimer.length){toast('✅ Aucune présence orpheline trouvée.','ok');return;}
+    const apercu=aSupprimer.slice(0,5).map(d=>{const p=d.data();return `• ${(p.nom||'').toUpperCase()} ${p.prenom||''} (tél: ${p.telephone||'—'})`;}).join('\n');
+    const suite=aSupprimer.length>5?`\n… et ${aSupprimer.length-5} autre(s)`:'';
+    if(!confirm(`${aSupprimer.length} présence(s) orpheline(s) :\n\n${apercu}${suite}\n\nConfirmer la suppression ?`)) return;
+    const batch=db.batch();
+    aSupprimer.forEach(d=>batch.delete(d.ref));
+    await batch.commit();
+    histoPresences={};
+    await buildStats();
+    toast(`🗑️ ${aSupprimer.length} présence(s) orpheline(s) supprimée(s)`,'ok');
+  } catch(e){console.error(e);toast('Erreur de purge','err');}
+}
+
+async function buildStats() {
+  try {
+    const snap=await db.collection('pharma_presences').get({source:'server'});
+    const all=snap.docs.map(d=>d.data());
+    const totalR=reunions.length, totalP=all.length;
+    const moy=totalR?(totalP/totalR).toFixed(1):0;
+
+    // Membres uniques
+    const phonesUniques=new Set(all.map(p=>(p.telephone||'').replace(/\s/g,'')).filter(Boolean));
+    const nomsUniques=new Set(all.filter(p=>!(p.telephone||'').trim()).map(p=>normalize(`${p.nom||''} ${p.prenom||''}`)).filter(Boolean));
+    document.getElementById('st-total-reunions').textContent=totalR;
+    document.getElementById('st-total-presences').textContent=totalP;
+    document.getElementById('st-moy-presences').textContent=moy;
+    document.getElementById('st-membres-uniques').textContent=phonesUniques.size+nomsUniques.size;
+
+    // Noms canoniques depuis la liste Personnel
+    const mSnap=await db.collection('pharma_membres').get({source:'server'});
+    const membres=mSnap.docs.map(d=>d.data());
+    const telToCanon={};
+    membres.forEach(m=>{const tel=(m.telephone||'').replace(/\s/g,'');if(tel)telToCanon[tel]=`${(m.nom||'').toUpperCase()} ${m.prenom||''}`.trim();});
+    const normToCanon={};
+    membres.forEach(m=>{
+      const key=normalize(`${m.nom||''} ${m.prenom||''}`);
+      if(key)normToCanon[key]=`${(m.nom||'').toUpperCase()} ${m.prenom||''}`.trim();
+      const nomKey=normalize(m.nom||'');
+      if(nomKey)normToCanon[nomKey]=`${(m.nom||'').toUpperCase()} ${m.prenom||''}`.trim();
+    });
+
+    // Regroupement unifié
+    const compteur={};
+    all.forEach(p=>{
+      const tel=(p.telephone||'').replace(/\s/g,'');
+      const fullNorm=normalize(`${p.nom||''} ${p.prenom||''}`);
+      const nomNorm=normalize(p.nom||'');
+      let cle,label;
+      if(tel){
+        cle='tel:'+tel;
+        label=telToCanon[tel]||`${(p.nom||'').toUpperCase()} ${p.prenom||''}`.trim();
+      } else {
+        const canon=normToCanon[fullNorm]||normToCanon[nomNorm];
+        cle='nom:'+(fullNorm||nomNorm||'?');
+        label=canon||`${(p.nom||'').toUpperCase()} ${p.prenom||''}`.trim();
+      }
+      if(!cle||cle==='tel:'||cle==='nom:?') return;
+      if(!compteur[cle]) compteur[cle]={label:label||'?',count:0};
+      if(label&&label!=='?') compteur[cle].label=label;
+      compteur[cle].count++;
+    });
+    const topList=Object.values(compteur).sort((a,b)=>b.count-a.count).slice(0,10);
+    const topEl=document.getElementById('st-top-membres');
+    if(!topList.length){topEl.innerHTML='<div class="empty-tbl"><div class="e-icon">👥</div><div class="e-title">Aucune donnée</div></div>';}
+    else {
+      const max=topList[0].count;
+      topEl.innerHTML=topList.map(({label,count},i)=>{
+        const pct=Math.round((count/max)*100);
+        const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'·';
+        return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="font-size:16px;width:24px">${medal}</span>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">${esc(label)}</div>
+          <div style="height:6px;background:var(--border);border-radius:3px;margin-top:4px">
+            <div style="height:6px;background:var(--accent);border-radius:3px;width:${pct}%"></div>
+          </div></div>
+          <span style="font-size:13px;font-weight:700;color:var(--accent2);min-width:40px;text-align:right">${count} fois</span>
+        </div>`;
+      }).join('');
+    }
+
+    const parR=reunions.map(r=>{
+      const cnt=all.filter(p=>p.reunionId===r.id).length;
+      const ds=r.date?new Date(r.date+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}):'–';
+      return{label:r.label,date:ds,cnt};
+    }).sort((a,b)=>b.cnt-a.cnt);
+    const maxR=parR[0]?.cnt||1;
+    document.getElementById('st-par-reunion').innerHTML=parR.map(r=>`
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.label)}</div>
+          <div style="font-size:11px;color:var(--grey)">${r.date}</div>
+          <div style="height:6px;background:var(--border);border-radius:3px;margin-top:4px">
+            <div style="height:6px;background:var(--green);border-radius:3px;width:${Math.round((r.cnt/maxR)*100)}%"></div>
+          </div>
+        </div>
+        <span style="font-size:13px;font-weight:700;color:var(--green);min-width:50px;text-align:right">${r.cnt} présent(s)</span>
+      </div>`).join('')||'<div class="empty-tbl"><div class="e-icon">📊</div><div class="e-title">Aucune donnée</div></div>';
+  } catch(e){console.error(e);}
+}
+
+function toggleDark() {
+  const isDark=document.body.classList.toggle('dark');
+  localStorage.setItem('pharma_dark',isDark?'1':'0');
+  document.getElementById('darkBtn').textContent=isDark?'☀️':'🌙';
+}
+
+function shareWhatsApp() {
+  if (!selectedR) return;
+  const url=buildScanUrl(selectedR.id);
+  const ds=selectedR.date?new Date(selectedR.date+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
+  const lieu=selectedR.lieu?`\n📍 Lieu : ${selectedR.lieu}`:'';
+  const msg=`💊 *Pharmacie de la Mé – Feuille de présence*\n\n*${selectedR.label}*\n📅 ${ds}${lieu}\n\n✍️ Cliquez sur le lien pour enregistrer votre présence :\n${url}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(msg,type=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast'+(type?' '+type:'')+' show';
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+document.getElementById('editBg').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+</script>
+</body>
+</html>
