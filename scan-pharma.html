@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Présence – Pharmacie de la Mé</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--primary:#4550E5;--primary2:#5B67F0;--accent:#4ECDC4;--red:#dc2626;--grey:#64748b;--border:#dde3f0}
+    body{font-family:'Outfit',sans-serif;background:linear-gradient(160deg,#3340CC 0%,#4550E5 55%,#5B67F0 100%);min-height:100vh;padding:24px 16px 48px;display:flex;flex-direction:column;align-items:center}
+
+    .brand-bar{width:100%;max-width:460px;display:flex;align-items:center;gap:12px;padding:0 4px;margin-bottom:20px}
+    .brand-logo{width:46px;height:46px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;padding:4px}
+    .brand-logo svg{width:38px;height:38px}
+    .brand-text{color:#fff}
+    .brand-text .name{font-size:17px;font-weight:800;letter-spacing:.5px}
+    .brand-text .tag{font-size:11px;opacity:.65;font-weight:500}
+
+    .card{background:#fff;border-radius:24px;width:100%;max-width:460px;box-shadow:0 24px 60px rgba(0,0,0,.3);overflow:hidden}
+    .card-header{background:linear-gradient(135deg,#3340CC,#4550E5);padding:22px 26px 20px;color:#fff}
+    .card-header .h-title{font-size:17px;font-weight:700}
+    .card-header .h-sub{font-size:12px;opacity:.7;margin-top:2px}
+    .meeting-strip{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:10px 14px;margin-top:14px}
+    .meeting-strip .m-name{font-size:14px;font-weight:600}
+    .meeting-strip .m-date{font-size:12px;opacity:.75;margin-top:3px;text-transform:capitalize}
+
+    .form-body{padding:22px 24px 28px}
+    .form-lead{font-size:14px;font-weight:600;color:#3340CC;margin-bottom:18px}
+    .already-warn{background:#fffbeb;border:1px solid #f59e0b;border-radius:10px;padding:11px 14px;font-size:13px;color:#92400e;margin-bottom:16px;display:none}
+
+    .field{margin-bottom:14px}
+    .field label{display:block;font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+    .field label .req{color:var(--red)}
+    .field input,.field select{width:100%;padding:13px 15px;border:1.5px solid var(--border);border-radius:12px;font-family:'Outfit',sans-serif;font-size:15px;color:#111827;background:#fafbff;transition:border-color .2s,box-shadow .2s,background .2s;outline:none;-webkit-appearance:none}
+    .field input:focus,.field select:focus{border-color:var(--primary2);background:#fff;box-shadow:0 0 0 3px rgba(78,205,196,.15)}
+    .field input.invalid{border-color:var(--red);background:#fff5f5}
+    .field .hint{font-size:11px;color:var(--red);margin-top:4px;display:none}
+    .field .hint.show{display:block}
+
+    .btn-submit{width:100%;margin-top:6px;padding:15px;background:linear-gradient(135deg,#4550E5,#5B67F0);color:#fff;border:none;border-radius:14px;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s;letter-spacing:.3px}
+    .btn-submit:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(69,80,229,.35)}
+    .btn-submit:disabled{background:#a5b4fc;cursor:not-allowed;transform:none;box-shadow:none}
+
+    .state-body{text-align:center;padding:48px 24px}
+    .state-icon{font-size:60px;margin-bottom:16px;display:block}
+    .state-title{font-size:22px;font-weight:800}
+    .state-sub{font-size:14px;color:var(--grey);line-height:1.6;margin-top:8px}
+    .success-name{display:inline-block;background:#d1faf8;color:#0f5e5a;border-radius:8px;padding:2px 10px;font-weight:700;margin-top:4px}
+
+    .page-footer{color:rgba(255,255,255,.35);font-size:11px;text-align:center;margin-top:24px;letter-spacing:.3px}
+    .erocime-badge{margin-top:8px;color:rgba(255,255,255,.25);font-size:10px;text-align:center}
+
+    .spinner{width:40px;height:40px;border:4px solid rgba(78,205,196,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+
+<!-- Logo Pharmacie de la Mé -->
+<div class="brand-bar">
+  <div class="brand-logo">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100" height="100" fill="#4550E5" rx="16"/>
+      <!-- Croix de cercles style logo -->
+      <circle cx="50" cy="18" r="16" fill="#4ECDC4"/>
+      <circle cx="18" cy="50" r="16" fill="#4ECDC4"/>
+      <circle cx="50" cy="50" r="16" fill="#4ECDC4"/>
+      <circle cx="82" cy="50" r="16" fill="#4ECDC4"/>
+      <circle cx="50" cy="82" r="16" fill="#4ECDC4"/>
+    </svg>
+  </div>
+  <div class="brand-text">
+    <div class="name">Pharmacie de la Mé</div>
+    <div class="tag">Système de présence numérique</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="h-title">📋 Feuille de Présence</div>
+    <div class="h-sub">Enregistrez votre présence à cette réunion</div>
+    <div class="meeting-strip">
+      <div class="m-name" id="mName">Chargement...</div>
+      <div class="m-date" id="mDate"></div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loadingView">
+    <div class="state-body">
+      <div class="spinner"></div>
+      <div class="state-title" style="color:#3340CC;font-size:16px">Vérification en cours...</div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div id="formView" style="display:none">
+    <div class="form-body">
+      <div class="already-warn" id="alreadyWarn">⚠️ Vous avez déjà enregistré votre présence pour cette réunion.</div>
+      <div class="form-lead">✍️ Sélectionnez votre nom ou saisissez vos informations :</div>
+
+      <div class="field" id="membreSelectField">
+        <label>Choisir dans la liste du personnel</label>
+        <select id="membreSelect" onchange="onMembreSelect()">
+          <option value="">— Sélectionner votre nom —</option>
+        </select>
+      </div>
+
+      <div id="manualFields">
+        <div class="field">
+          <label>NOM <span class="req">*</span></label>
+          <input type="text" id="f-nom" placeholder="Votre nom de famille" autocomplete="family-name">
+          <div class="hint" id="h-nom">Ce champ est obligatoire</div>
+        </div>
+        <div class="field">
+          <label>Prénom <span class="req">*</span></label>
+          <input type="text" id="f-prenom" placeholder="Votre prénom" autocomplete="given-name">
+          <div class="hint" id="h-prenom">Ce champ est obligatoire</div>
+        </div>
+        <div class="field">
+          <label>Fonction / Poste <span class="req">*</span></label>
+          <input type="text" id="f-fonction" placeholder="Ex : Pharmacien, Préparateur, Caissier…">
+          <div class="hint" id="h-fonction">Ce champ est obligatoire</div>
+        </div>
+        <div class="field">
+          <label>Téléphone <span class="req">*</span></label>
+          <input type="tel" id="f-telephone" placeholder="Ex : 07 00 00 00 00" autocomplete="tel">
+          <div class="hint" id="h-telephone">Ce champ est obligatoire</div>
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="f-email" placeholder="votre@email.com" autocomplete="email">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Signature <span class="req">*</span></label>
+        <div style="position:relative;border:1.5px solid var(--border);border-radius:12px;background:#fafbff;overflow:hidden" id="sigBox">
+          <canvas id="sigCanvas" style="display:block;width:100%;touch-action:none;cursor:crosshair"></canvas>
+          <div id="sigPlaceholder" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;color:#94a3b8;font-size:13px;font-weight:500">
+            ✍️ Signez ici avec votre doigt
+          </div>
+          <button type="button" onclick="clearSig()" style="position:absolute;top:8px;right:8px;background:rgba(255,255,255,0.9);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--grey);cursor:pointer">
+            🗑️ Effacer
+          </button>
+        </div>
+        <div class="hint" id="h-sig">Veuillez apposer votre signature</div>
+      </div>
+
+      <button class="btn-submit" id="btnSubmit" onclick="handleSubmit()">✅ Confirmer ma présence</button>
+    </div>
+  </div>
+
+  <!-- Success -->
+  <div id="successView" style="display:none">
+    <div class="state-body">
+      <span class="state-icon">✅</span>
+      <div class="state-title" style="color:#065f46">Présence confirmée !</div>
+      <div class="state-sub">
+        Merci <span class="success-name" id="s-fullname"></span><br>
+        Votre présence a bien été enregistrée.
+      </div>
+      <div style="margin-top:28px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:16px 20px;text-align:center">
+        <div style="font-size:28px;margin-bottom:8px">💊</div>
+        <div style="font-size:14px;font-weight:700;color:#14532d">Vous pouvez fermer cette page</div>
+        <div style="font-size:12px;color:#166534;margin-top:4px">Rejoignez la réunion — bonne séance !</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div id="errorView" style="display:none">
+    <div class="state-body">
+      <span class="state-icon">❌</span>
+      <div class="state-title" style="color:#991b1b">QR Code invalide</div>
+      <div class="state-sub">Ce QR code n'est pas valide<br>ou la réunion n'existe plus.</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-footer">Pharmacie de la Mé © 2025 – Présences numériques</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// ⚙️  CONFIGURATION FIREBASE  —  À COMPLÉTER
+// Créez un projet Firebase distinct sur console.firebase.google.com
+// Projet suggéré : "pharma-me-presences"
+// ═══════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey:            "VOTRE_API_KEY",
+  authDomain:        "pharma-me-presences.firebaseapp.com",
+  projectId:         "pharma-me-presences",
+  storageBucket:     "pharma-me-presences.firebasestorage.app",
+  messagingSenderId: "VOTRE_SENDER_ID",
+  appId:             "VOTRE_APP_ID"
+};
+// ═══════════════════════════════════════════════
+
+const params    = new URLSearchParams(window.location.search);
+const reunionId = params.get('reunion');
+
+function show(id) {
+  ['loadingView','formView','successView','errorView'].forEach(v=>{
+    document.getElementById(v).style.display=(v===id)?'block':'none';
+  });
+}
+
+let db = null;
+
+async function loadFirebase() {
+  return new Promise((resolve, reject) => {
+    const s1 = document.createElement('script');
+    s1.src = 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js';
+    s1.onload = () => {
+      const s2 = document.createElement('script');
+      s2.src = 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js';
+      s2.onload = () => {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        resolve();
+      };
+      s2.onerror = reject;
+      document.head.appendChild(s2);
+    };
+    s1.onerror = reject;
+    document.head.appendChild(s1);
+  });
+}
+
+async function init() {
+  if (!reunionId) { show('errorView'); return; }
+  try {
+    await loadFirebase();
+    const snap = await db.collection('pharma_reunions').doc(reunionId).get();
+    if (!snap.exists) { show('errorView'); return; }
+    const d = snap.data();
+    document.getElementById('mName').textContent = d.label || 'Réunion Pharmacie de la Mé';
+    if (d.date) {
+      const dt = new Date(d.date+'T00:00:00');
+      document.getElementById('mDate').textContent = '📅 '+dt.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    }
+    if (localStorage.getItem('signed_'+reunionId)) {
+      document.getElementById('alreadyWarn').style.display='block';
+    }
+    // Load membre list
+    try {
+      const mSnap = await db.collection('pharma_membres').orderBy('nom','asc').get();
+      const sel   = document.getElementById('membreSelect');
+      mSnap.docs.forEach(d => {
+        const m   = d.data();
+        const opt = document.createElement('option');
+        opt.value = d.id;
+        opt.textContent = `${(m.nom||'').toUpperCase()} ${m.prenom||''} – ${m.fonction||''}`;
+        opt.dataset.nom = m.nom||'';
+        opt.dataset.prenom = m.prenom||'';
+        opt.dataset.fonction = m.fonction||'';
+        opt.dataset.telephone = m.telephone||'';
+        opt.dataset.email = m.email||'';
+        sel.appendChild(opt);
+      });
+      if (mSnap.size === 0) {
+        document.getElementById('membreSelectField').style.display = 'none';
+      }
+    } catch(e) { document.getElementById('membreSelectField').style.display='none'; }
+
+    show('formView');
+    setTimeout(initSig, 100);
+  } catch(e) {
+    console.error(e);
+    show('errorView');
+  }
+}
+
+function onMembreSelect() {
+  const sel = document.getElementById('membreSelect');
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt || !opt.value) return;
+  document.getElementById('f-nom').value       = opt.dataset.nom.toUpperCase();
+  document.getElementById('f-prenom').value    = opt.dataset.prenom;
+  document.getElementById('f-fonction').value  = opt.dataset.fonction;
+  document.getElementById('f-telephone').value = opt.dataset.telephone;
+  document.getElementById('f-email').value     = opt.dataset.email;
+  ['f-nom','f-prenom','f-fonction','f-telephone'].forEach(id=>{
+    document.getElementById(id).classList.remove('invalid');
+  });
+  ['h-nom','h-prenom','h-fonction','h-telephone'].forEach(id=>{
+    document.getElementById(id).classList.remove('show');
+  });
+}
+
+let sigCanvas, sigCtx, isSigning = false, hasSig = false;
+
+function initSig() {
+  sigCanvas = document.getElementById('sigCanvas');
+  const rect = sigCanvas.parentElement.getBoundingClientRect();
+  const w = rect.width || 320;
+  sigCanvas.width  = w * window.devicePixelRatio;
+  sigCanvas.height = 130 * window.devicePixelRatio;
+  sigCanvas.style.height = '130px';
+  sigCtx = sigCanvas.getContext('2d');
+  sigCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  sigCtx.strokeStyle = '#3340CC';
+  sigCtx.lineWidth   = 2.5;
+  sigCtx.lineCap     = 'round';
+  sigCtx.lineJoin    = 'round';
+
+  function pos(e) {
+    const r = sigCanvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - r.left, y: src.clientY - r.top };
+  }
+
+  sigCanvas.addEventListener('pointerdown', e => {
+    isSigning = true; hasSig = true;
+    sigCtx.beginPath();
+    const p = pos(e);
+    sigCtx.moveTo(p.x, p.y);
+    document.getElementById('sigPlaceholder').style.display = 'none';
+    document.getElementById('sigBox').style.borderColor = '#4ECDC4';
+    document.getElementById('h-sig').classList.remove('show');
+    e.preventDefault();
+  });
+  sigCanvas.addEventListener('pointermove', e => {
+    if (!isSigning) return;
+    const p = pos(e);
+    sigCtx.lineTo(p.x, p.y);
+    sigCtx.stroke();
+    sigCtx.beginPath();
+    sigCtx.moveTo(p.x, p.y);
+    e.preventDefault();
+  });
+  ['pointerup','pointercancel'].forEach(ev =>
+    sigCanvas.addEventListener(ev, () => { isSigning = false; })
+  );
+}
+
+function clearSig() {
+  sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+  hasSig = false;
+  document.getElementById('sigPlaceholder').style.display = 'flex';
+  document.getElementById('sigBox').style.borderColor = 'var(--border)';
+}
+
+function getSigDataUrl() {
+  return sigCanvas.toDataURL('image/png');
+}
+
+function validate(id, hintId) {
+  const val = document.getElementById(id).value.trim();
+  const ok  = val.length > 0;
+  document.getElementById(id).classList.toggle('invalid',!ok);
+  document.getElementById(hintId).classList.toggle('show',!ok);
+  return ok;
+}
+
+async function handleSubmit() {
+  const fieldsOk = [
+    validate('f-prenom','h-prenom'),
+    validate('f-nom','h-nom'),
+    validate('f-fonction','h-fonction'),
+    validate('f-telephone','h-telephone'),
+  ].every(Boolean);
+
+  if (!hasSig) {
+    document.getElementById('h-sig').classList.add('show');
+    document.getElementById('sigBox').style.borderColor = 'var(--red)';
+  }
+
+  if (!fieldsOk || !hasSig) return;
+
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.textContent = '⏳ Enregistrement en cours…';
+
+  const prenom    = document.getElementById('f-prenom').value.trim();
+  const nom       = document.getElementById('f-nom').value.trim();
+  const fonction  = document.getElementById('f-fonction').value.trim();
+  const telephone = document.getElementById('f-telephone').value.trim();
+  const email     = document.getElementById('f-email').value.trim();
+  const signature = getSigDataUrl();
+
+  try {
+    await db.collection('pharma_presences').add({
+      reunionId, prenom, nom, fonction, telephone, email, signature,
+      dateSignature: new Date().toISOString(),
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    localStorage.setItem('signed_'+reunionId,'1');
+    document.getElementById('s-fullname').textContent = prenom+' '+nom.toUpperCase();
+    show('successView');
+  } catch(e) {
+    console.error(e);
+    btn.disabled = false;
+    btn.textContent = '✅ Confirmer ma présence';
+    alert('❌ Erreur de connexion. Vérifiez votre réseau et réessayez.');
+  }
+}
+
+init();
+</script>
+</body>
+</html>
